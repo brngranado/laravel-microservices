@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\GroceryStore;
+use Illuminate\Http\Request;
+
+class GroseryStoreController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+       return GroceryStore::all();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public static function store($request)
+    {
+        $allGroceries = GroceryStore::all()->keyBy('code');
+    
+        foreach ($request as $ingredient) {
+            $groceryStoreId = $ingredient['grocery_store_id'];
+            $requestedQuantity = $ingredient['quantity'];
+            if (isset($allGroceries[$groceryStoreId])) {
+                $grocery = $allGroceries[$groceryStoreId];
+                $newQuantity = $grocery->quantity - $requestedQuantity;
+                if ($newQuantity >= 0) {
+                    $grocery->quantity = $newQuantity;
+                    $grocery->save(); // Save the updated grocery item
+                } else {
+                    return response()->json(['message' => 'Insufficient quantity for grocery store ID: ' . $groceryStoreId], 400);
+                }
+            } else {
+                return response()->json(['message' => 'Grocery store ID: ' . $groceryStoreId . ' not found.'], 404);
+            }
+        }
+    
+        return response()->json(['message' => 'Grocery Store updated successfully'], 200);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        return response()->json(['message' => 'Grosery Store show'], 200);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        return response()->json(['message' => 'Grosery Store edit'], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        return response()->json(['message' => 'Grosery Store update'], 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        return response()->json(['message' => 'Grosery Store destroy'], 200);
+    }
+}
