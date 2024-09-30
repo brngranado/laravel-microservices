@@ -95,7 +95,7 @@ class CousineMQConsumer extends Command
 
     public function notifyToRecipes($cousine)  {
         $recipeId = rand(1, 6);
-        SendMQ::handle('receive_notify_recipe_queue', 'receive_notify_recipe_exchange', 'recipe_key_get', ['id' => $recipeId]);
+        SendMQ::handle('receive_notify_recipe_queue', 'receive_notify_recipe_exchange', 'recipe_key_get', ['id' => $recipeId, 'cousine_id' => $cousine['id']]);
         CousineController::update(['recipe_id' => $recipeId, 'id' => $cousine['id']]);
     }
 

@@ -14,7 +14,7 @@ class CousineController extends Controller
      */
     public static function index()
     {
-        return Cousine::whereIn('status_id', [5, 6])->get();
+        return Cousine::whereIn('status_id', [5, 6, 7])->get();
     }
 
     /**

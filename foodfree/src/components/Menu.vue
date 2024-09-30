@@ -4,8 +4,17 @@
       <summary>En cocina</summary>
       <div class="menu-items grid-layout">
         <button @click=" item.status_id === 6 && updateCousineStatusFinalize(item)" v-for="item in cousine" :key="item.id"  class="menu-button">
-          <img :src="item.status_id === 5 ? '/cocinando.jpg' : '/platillo.jpg'" alt="" class="item-image"/>
-          <span  class="item-title">N°{{ item.order_number }} - {{ item.status_id ===  5 ? 'pendiente': 'despachar' }}</span>
+          <img :src="item.status_id === 5 || item.status_id === 7 ? '/cocinando.jpg' : '/platillo.jpg'" alt="" class="item-image"/>
+          <span class="item-title">
+            N°{{ item.order_number }} - 
+            {{
+              item.status_id === 5 
+                ? 'pendiente' 
+                : item.status_id === 7 
+                  ? 'En espera por ingredientes' 
+                  : 'despachar'
+            }}
+          </span>
         </button>
       </div>
     </details>

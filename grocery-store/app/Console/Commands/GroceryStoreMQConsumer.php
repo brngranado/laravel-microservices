@@ -58,7 +58,7 @@ class GroceryStoreMQConsumer extends Command
             $ingredients = json_decode($msg->body, true);
 
             try {
-            GroseryStoreController::store($ingredients['ingredients']);
+            GroseryStoreController::store($ingredients);
                 echo "Desconto los ingredientes exitosamente.\n";
             } catch (\Exception $e) {
                 echo "Error al obtener recipe: " . $e->getMessage() . "\n";

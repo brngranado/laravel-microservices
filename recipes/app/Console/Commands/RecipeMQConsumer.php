@@ -58,7 +58,7 @@ class RecipeMQConsumer extends Command
             try {
                 $dataIngredients = RecipeController::findRecipeWithGroseryStore($recipeId['id']);
                 Log::info('Recipe with ingredients: '.$dataIngredients);
-                $this->notifyToGroceryStore($dataIngredients);
+                $this->notifyToGroceryStore($dataIngredients, $recipeId['cousine_id']);
                 
                 echo "Recipe obtenido exitosamente.\n";
             } catch (\Exception $e) {
@@ -72,9 +72,9 @@ class RecipeMQConsumer extends Command
         echo 'Waiting for new messages on receive_notify_recipe_queue', "\n";
     }
 
-    public function notifyToGroceryStore($recipe)  {
+    public function notifyToGroceryStore($recipe, $cousine_id) {
         $ingredients = $recipe['ingredients'];
-        SendMQ::handle('receive_notify_grocery_queue', 'receive_notify_grocery_exchange', 'grocery_key_get', ['ingredients' => $ingredients]);
+        SendMQ::handle('receive_notify_grocery_queue', 'receive_notify_grocery_exchange', 'grocery_key_get', ['ingredients' => $ingredients, 'cousine_id' => $cousine_id]);
 
     }
 
