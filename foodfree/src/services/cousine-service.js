@@ -19,6 +19,10 @@ export const editCousine = async (cousine) => {
     return axios.put(`http://api-manager.test/api/cousine/${cousine.id}`, cousine)
 }
 
+export const editCousineWithIngredientsUpdated = async (cousine) => {
+    return axios.put(`http://api-manager.test/api/cousine-ingredient-updated/${cousine.id}`, cousine)
+}
+
 export const deleteCousine = async (id) => {
     return axios.delete(`http://api-manager.test/api/cousine/${id}`)
 }

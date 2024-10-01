@@ -19,5 +19,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('/cousine', \App\Http\Controllers\CousineController::class);
+Route::put('/cousine-ingredient-updated/{cousine}', [\App\Http\Controllers\CousineController::class, 'updateWithIngredientsUpdated']);
 Route::resource('/recipe', \App\Http\Controllers\RecipeController::class);
 Route::resource('/grocery', \App\Http\Controllers\GroseryStoreController::class);

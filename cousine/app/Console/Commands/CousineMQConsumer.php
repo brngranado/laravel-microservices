@@ -43,6 +43,7 @@ class CousineMQConsumer extends Command
         self::connect();
         $this->process_store_queue('send_store_cousine_queue');
         $this->process_update_status_queue('send_update_cousine_queue');
+        $this->process_update_status_queue_ingredient('send_update_cousine_ingredient_queue');
         $this->process_get_queue('send_get_cousine_queue', 'send_get_cousine_exchange', 'cousine_key_get');
         while (self::$channel->is_consuming()) {
             self::$channel->wait();
@@ -92,11 +93,38 @@ class CousineMQConsumer extends Command
             echo 'Waiting for new messages on send_update_cousine_queue', "\n";
     }
 
+    public function process_update_status_queue_ingredient($queueName)
+    {
+            $callback = function ($msg) {
+                echo ' [x] Recibiendo: ', $msg->body, "\n";
+    
+                $cousine = json_decode($msg->body, true);
+                try {
+                    CousineController::update(['status_id' => $cousine['status_id'], 'id' => $cousine['id']]);
+                    $findOne = Cousine::find($cousine['id']);
+                    $this->notifyToRecipesThatHaveIngredients($findOne->recipe_id, $cousine);
+                    echo "Cousine actualizado con ingredients status exitosamente.\n";
+                } catch (\Exception $e) {
+                    echo "Error al actualizar status Cousine ingredients: " . $e->getMessage() . "\n";
+                }
+            };
+        
+            self::$channel->queue_declare($queueName, false, false, false, false);
+            self::$channel->basic_consume($queueName, '', false, true, false, false, $callback);
+        
+            echo 'Waiting for new messages on send_update_cousine_ingredient_queue', "\n";
+    }
+
+
 
     public function notifyToRecipes($cousine)  {
         $recipeId = rand(1, 6);
         SendMQ::handle('receive_notify_recipe_queue', 'receive_notify_recipe_exchange', 'recipe_key_get', ['id' => $recipeId, 'cousine_id' => $cousine['id']]);
         CousineController::update(['recipe_id' => $recipeId, 'id' => $cousine['id']]);
+    }
+
+    public function notifyToRecipesThatHaveIngredients($recipeId, $cousine)  {
+        SendMQ::handle('receive_notify_recipe_queue', 'receive_notify_recipe_exchange', 'recipe_key_get', ['id' => $recipeId, 'cousine_id' => $cousine['id']]);
     }
 
     public function process_get_queue($queueName, $exchangeName, $routingKey)

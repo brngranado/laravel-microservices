@@ -20,3 +20,8 @@ export const editgrocery = async (grocery) => {
 export const getgrocery = async (id) => {
     return axios.get(`http://api-manager.test/api/grocery/${id}`)
 }
+
+
+export const buyMarket = async (ingredient) => {
+    return axios.get(`https://recruitment.alegra.com/api/farmers-market/buy?ingredient=${ingredient}`)
+}

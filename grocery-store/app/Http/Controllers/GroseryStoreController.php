@@ -75,7 +75,15 @@ class GroseryStoreController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        return response()->json(['message' => 'Grosery Store update'], 200);
+        $cousine = GroceryStore::find($id);
+
+        $attributesToUpdate = [];
+
+        if (isset($request['quantity'])) {
+            $attributesToUpdate['quantity'] = $request['quantity'];
+        }
+    
+        $cousine->update($attributesToUpdate);
     }
 
     /**

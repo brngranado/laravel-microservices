@@ -55,15 +55,8 @@ class GroseryStoreController extends Controller
     public function update(Request $request, string $id)
     {
         // Preparar los datos para la actualización
-        $payload = [
-            'request' => $request->all(),
-            'id' => $id,
-        ];
-        
-        // Despachar el job para actualizar un item específico
-        $groceryItem = UpdateGroceryItemJob::dispatch($payload);
-
-        return response()->json($groceryItem, 200); // Retornar el item actualizado
+        Http::put('http://grocery-store.test/api/grocery-store/'.$id, $request->all());
+        return response()->json(['message' => 'Grocery Item updated'], 200);
     }
 
     /**

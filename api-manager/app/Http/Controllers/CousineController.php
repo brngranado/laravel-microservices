@@ -52,6 +52,9 @@ class CousineController extends Controller
         }
     }
 
+
+
+
     /**
      * Update the specified resource in storage.
      */
@@ -67,6 +70,22 @@ class CousineController extends Controller
         SendMQ::handle('send_update_cousine_queue','send_update_cousine_exchange','cousine_key_update', $payload);
         SendMQ::close();
     }
+
+    public function updateWithIngredientsUpdated(Request $request, string $id)
+    {
+        $payload = [
+            'order_number' => $request->order_number,
+            'status_id' => $request->status_id,
+            'recipe_id' => $request->recipe_id,
+            'id' => $id
+        ];
+
+        // Despachar el job para actualizar una receta específica
+        SendMQ::handle('send_update_cousine_ingredient_queue','send_update_cousine_ingredient_exchange','cousine_key_update_ingredient', $payload);
+        SendMQ::close();
+    }
+
+
 
     /**
      * Remove the specified resource from storage.

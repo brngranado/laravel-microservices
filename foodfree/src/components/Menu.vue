@@ -6,7 +6,7 @@
         <button @click=" item.status_id === 6 && updateCousineStatusFinalize(item)" v-for="item in cousine" :key="item.id"  class="menu-button">
           <img :src="item.status_id === 5 || item.status_id === 7 ? '/cocinando.jpg' : '/platillo.jpg'" alt="" class="item-image"/>
           <span class="item-title">
-            N°{{ item.order_number }} - 
+            N°{{ item.order_number }} - {{ recipes.find(r => r.id === item.recipe_id).name }} -
             {{
               item.status_id === 5 
                 ? 'pendiente' 
@@ -25,6 +25,7 @@
         <button v-for="item in groceries" :key="item.id"  class="menu-button">
           <img :src="item.image" alt="" class="item-image"/>
           <span class="item-title">{{ item.ingredient }} -  qty:{{ item.quantity }}</span>
+          <span v-if="item.quantity === 0" @click="buyToMarket(item)">comprar</span>
         </button>
       </div>
     </details>
@@ -55,8 +56,8 @@
 </template>
 
 <script>
-import { listCousines, editCousine} from '../services/cousine-service.js';
-import { listGroceries} from '../services/groceries-service.js';
+import { listCousines, editCousine, editCousineWithIngredientsUpdated} from '../services/cousine-service.js';
+import { listGroceries, buyMarket, editgrocery } from '../services/groceries-service.js';
 import{listRecipes} from '../services/recipes-service.js';
 
 export default {
@@ -77,6 +78,18 @@ export default {
     };
   },
   methods: {
+
+    async buyToMarket(item) {
+      const res = await buyMarket(item.ingredient);
+      if (res.status === 200 && res.data.quantitySold > 0) {
+        const payload = {
+          id: item.id,
+          quantity: res.data.quantitySold,
+        }
+        await editgrocery(payload);
+        this.getListGroceries();
+      }
+    },
     openRecipeModal(recipe) {
     this.selectedRecipe = recipe.ingredients
         .map(item => {
@@ -94,7 +107,18 @@ export default {
       const itemsToUpdate = this.cousine.filter(item => item.status_id === 5);
       if (itemsToUpdate.length > 0) {
         const updatePromises = itemsToUpdate.map(item => {
-          return editCousine({id: item.id, status_id: 6 }); // Change 1 to whatever "ready" status is
+          return editCousine({id: item.id, status_id: 6 });
+        });
+        await Promise.all(updatePromises);
+        await this.getListCousine();
+      }
+    },
+
+    async updateCousineStatusWhenExistIngredient() {
+      const itemsToUpdate = this.cousine.filter(item => item.status_id ===7);
+      if (itemsToUpdate.length > 0) {
+        const updatePromises = itemsToUpdate.map(item => {
+          return editCousineWithIngredientsUpdated({id: item.id, status_id: 5, recipe_id: item.recipe_id }); 
         });
         await Promise.all(updatePromises);
         await this.getListCousine();
@@ -200,6 +224,7 @@ export default {
     this.updateInterval = setInterval(() => {
       console.log('Updating status...');
       this.updateCousineStatus();
+      this.updateCousineStatusWhenExistIngredient();
     }, 120000);
   },
 
