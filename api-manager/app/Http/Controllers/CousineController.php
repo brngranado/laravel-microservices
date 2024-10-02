@@ -20,7 +20,7 @@ class CousineController extends Controller
      */
     public function index()
     {
-        $response = Http::get('http://cousine.test/api/cousine');
+        $response = Http::get('http://nginx/api/cousine');
         if ($response->successful()) {
             return response()->json($response->json(), 200);
         } else {
@@ -44,7 +44,7 @@ class CousineController extends Controller
      */
     public function show(string $id)
     {
-        $response = Http::get('http://cousine.test/api/cousine/'.$id);
+        $response = Http::get('http://nginx/api/cousine/'.$id);
         if ($response->successful()) {
             return response()->json($response->json(), 200);
         } else {

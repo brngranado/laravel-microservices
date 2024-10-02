@@ -17,7 +17,7 @@ class RecipeController extends Controller
      */
     public function index()
     {
-        $response = Http::get('http://recipes.test/api/recipe');
+        $response = Http::get('http://nginx/api/recipe');
         if ($response->successful()) {
             return response()->json($response->json(), 200);
         } else {
@@ -42,7 +42,7 @@ class RecipeController extends Controller
     public function show(string $id)
     {
         // Despachar el job para encontrar una receta específica por ID
-        $response = Http::get('http://recipes.test/api/recipe/'.$id);
+        $response = Http::get('http://nginx/api/recipe/'.$id);
         if ($response->successful()) {
             return response()->json($response->json(), 200);
         } else {

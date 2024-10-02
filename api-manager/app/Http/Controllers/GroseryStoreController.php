@@ -17,7 +17,7 @@ class GroseryStoreController extends Controller
      */
     public function index()
     {
-        $response = Http::get('http://grocery-store.test/api/grocery-store');
+        $response = Http::get('http://nginx/api/grocery-store');
         if ($response->successful()) {
             return response()->json($response->json(), 200);
         } else {
@@ -41,7 +41,7 @@ class GroseryStoreController extends Controller
      */
     public function show(string $id)
     {
-        $response = Http::get('http://grocery-store.test/api/grocery-store/'.$id);
+        $response = Http::get('http://nginx/api/grocery-store/'.$id);
         if ($response->successful()) {
             return response()->json($response->json(), 200);
         } else {
@@ -55,7 +55,7 @@ class GroseryStoreController extends Controller
     public function update(Request $request, string $id)
     {
         // Preparar los datos para la actualización
-        Http::put('http://grocery-store.test/api/grocery-store/'.$id, $request->all());
+        Http::put('http://nginx/api/grocery-store/'.$id, $request->all());
         return response()->json(['message' => 'Grocery Item updated'], 200);
     }
 
