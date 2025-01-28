@@ -1,24 +1,24 @@
 import axios from 'axios';
 
 export const listGroceries = async () => {
-    return axios('http://api-manager.test/api/grocery')
+    return axios(`${process.env.VUE_APP_API_URL}/grocery`)
         .then(response => response)
 }
 
 export const addgrocery = async (grocery) => {
-    return axios.post('http://api-manager.test/api/grocery', grocery)
-}   
+    return axios.post(`${process.env.VUE_APP_API_URL}/grocery`, grocery)
+}
 
 export const deletegrocery = async (id) => {
-    return axios.delete(`http://api-manager.test/api/grocery/${id}`)
+    return axios.delete(`${process.env.VUE_APP_API_URL}/grocery/${id}`)
 }
 
 export const editgrocery = async (grocery) => {
-    return axios.put(`http://api-manager.test/api/grocery/${grocery.id}`, grocery)
+    return axios.put(`${process.env.VUE_APP_API_URL}/grocery/${grocery.id}`, grocery)
 }
 
 export const getgrocery = async (id) => {
-    return axios.get(`http://api-manager.test/api/grocery/${id}`)
+    return axios.get(`${process.env.VUE_APP_API_URL}/grocery/${id}`)
 }
 
 

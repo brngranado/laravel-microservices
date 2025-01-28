@@ -2,25 +2,32 @@
   <div class="menu">
     <details class="category">
       <summary>En cocina</summary>
+      <div class="container-historial">
+        <button @click="modalHistoryCousine = !modalHistoryCousine">Historial</button>
+      </div>
       <div class="menu-items grid-layout">
         <button @click=" item.status_id === 6 && updateCousineStatusFinalize(item)" v-for="item in cousine" :key="item.id"  class="menu-button">
           <img :src="item.status_id === 5 || item.status_id === 7 ? '/cocinando.jpg' : '/platillo.jpg'" alt="" class="item-image"/>
           <span class="item-title">
             N°{{ item.order_number }} - {{ recipes.find(r => r.id === item.recipe_id).name }} -
             {{
-              item.status_id === 5 
-                ? 'pendiente' 
-                : item.status_id === 7 
-                  ? 'En espera por ingredientes' 
+              item.status_id === 5
+                ? 'pendiente'
+                : item.status_id === 7
+                  ? 'En espera por ingredientes'
                   : 'despachar'
             }}
           </span>
         </button>
       </div>
+
     </details>
     <hr>
     <details class="category">
       <summary>Bodega</summary>
+      <div class="container-historial">
+        <button @click="modalHistoryGroceries = !modalHistoryGroceries">Historial</button>
+      </div>
       <div class="menu-items grid-layout">
         <button v-for="item in groceries" :key="item.id"  class="menu-button">
           <img :src="item.image" alt="" class="item-image"/>
@@ -52,6 +59,32 @@
       </div>
     </div>
 
+    <div v-if="modalHistoryCousine" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <h2>Historial de pedidos </h2>
+        <ul>
+          <li v-for="cousine in cousineHistorial" :key="cousine.id">
+            {{ cousine.order_number }} - status: {{ cousine.status_id === 4 && 'Despachado'}} - date: {{ cousine.created_at }}
+          </li>
+        </ul>
+        <!-- Add more recipe details as needed -->
+        <button @click="closeModal">Close</button>
+      </div>
+    </div>
+
+    <div v-if="modalHistoryGroceries" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <h2>Historial de compras </h2>
+        <ul>
+          <li v-for="grocery in groceryStoreHistorial" :key="grocery.id">
+            {{ grocery.ingredients }} - status: {{ grocery.status_id === 1 && 'Existe'}} - Última compra: {{ grocery.created_at }}
+          </li>
+        </ul>
+        <!-- Add more recipe details as needed -->
+        <button @click="closeModal">Close</button>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -71,9 +104,13 @@ export default {
   data() {
     return {
       cousine:[],
+      cousineHistorial: [],
+      groceryStoreHistorial: [],
       groceries: [],
       recipes: [],
       modal: false,
+      modalHistoryCousine: false,
+      modalHistoryGroceries: false,
       selectedRecipe: {},
     };
   },
@@ -100,7 +137,7 @@ export default {
             };
         })
         .filter(item => item.ingredientName !== 'No existe');
-    this.modal = true; 
+    this.modal = true;
 },
 
   async updateCousineStatus() {
@@ -118,7 +155,7 @@ export default {
       const itemsToUpdate = this.cousine.filter(item => item.status_id ===7);
       if (itemsToUpdate.length > 0) {
         const updatePromises = itemsToUpdate.map(item => {
-          return editCousineWithIngredientsUpdated({id: item.id, status_id: 5, recipe_id: item.recipe_id }); 
+          return editCousineWithIngredientsUpdated({id: item.id, status_id: 5, recipe_id: item.recipe_id });
         });
         await Promise.all(updatePromises);
         await this.getListCousine();
@@ -131,14 +168,18 @@ export default {
     },
 
     closeModal() {
-      this.modal = false; 
+      this.modal = false;
+      this.modalHistoryCousine = false;
+      this.modalHistoryGroceries = false;
     },
     async getListCousine() {
     const cousines = await  listCousines();
-    this.cousine = cousines.data;
-    },
+    this.cousine = cousines.data.filter(item => item.status_id === 5 || item.status_id === 7  || item.status_id === 6);
+    this.cousineHistorial = cousines.data.filter(item => item.status_id === 4);
+  },
     async getListGroceries() {
     const groceries = await  listGroceries();
+    const groceryStoreHistorial = await getHistoryGrocery();
     const groceriesModified = groceries.data.map((grocery) => {
       if (grocery.ingredient === 'tomato') {
         return {
@@ -155,7 +196,7 @@ export default {
       if (grocery.ingredient ==='potato') {
         return {
           ...grocery,
-          image: 'papa.png',
+          image: '/papa.png',
         }
       }
       if (grocery.ingredient === 'rice') {
@@ -191,7 +232,7 @@ export default {
       if (grocery.ingredient =='meat') {
         return {
           ...grocery,
-          image: 'carne.png',
+          image: '/carne.png',
         }
       }
       if (grocery.ingredient =='chicken') {
@@ -202,6 +243,7 @@ export default {
       }
     })
     this.groceries = groceriesModified;
+    this.groceryStoreHistorial = groceryStoreHistorial.data;
     },
 
     async getListRecipes() {
@@ -376,5 +418,12 @@ export default {
 
 .modal-content h2 {
   margin-top: 0;
+}
+
+.container-historial {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    margin-bottom: 30px;
 }
 </style>
